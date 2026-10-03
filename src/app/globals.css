@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Paleta da spec (docs/MVP_v1.1.md §7.3). Vermelho = problema, nunca "ocupada". */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-primaria: #1e40af;
+  --color-primaria-escura: #1e3a8a;
+
+  --color-livre: #15803d;
+  --color-ocupada: #334155;
+  --color-reservada: #f59e0b;
+  --color-reservada-texto: #451a03;
+  --color-bloqueada: #e2e8f0;
+  --color-bloqueada-texto: #475569;
+  --color-alerta: #dc2626;
+}
+
+/* Só tema claro no MVP: legibilidade no sol do pátio. */
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.hachura {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    rgb(148 163 184 / 0.35) 6px 8px
+  );
+}
