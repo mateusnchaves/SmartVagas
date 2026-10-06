@@ -3,6 +3,7 @@
 import { Check, HandCoins, X } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { Placa } from "@/components/placa";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatarCentavos } from "@/lib/dinheiro";
@@ -37,11 +38,9 @@ export function LinhaReserva({ reserva, fuso, modo }: { reserva: ReservaParaTela
   return (
     <li className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
       <div className="min-w-0 flex-1">
-        <p className="font-bold tracking-wider">
-          {reserva.placa}
-          <span className="ml-2 font-mono text-sm font-semibold tracking-widest text-slate-500">
-            {reserva.codigo}
-          </span>
+        <p className="flex items-center gap-2">
+          <Placa valor={reserva.placa} />
+          <span className="font-mono text-sm font-semibold tracking-widest text-slate-500">{reserva.codigo}</span>
         </p>
         <p className="text-sm text-slate-600">
           {reserva.nome} · vaga {reserva.vaga} · {formatarDataHora(new Date(reserva.inicioEm), fuso)} →{" "}

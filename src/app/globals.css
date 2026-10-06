@@ -6,6 +6,7 @@
 
   --color-primaria: #1e40af;
   --color-primaria-escura: #1e3a8a;
+  --color-placa: #003399;
 
   --color-livre: #15803d;
   --color-ocupada: #334155;
@@ -14,6 +15,21 @@
   --color-bloqueada: #e2e8f0;
   --color-bloqueada-texto: #475569;
   --color-alerta: #dc2626;
+
+  --shadow-cartao: 0 1px 2px rgb(15 23 42 / 0.05), 0 8px 20px -6px rgb(15 23 42 / 0.07);
+  --shadow-elevado: 0 2px 4px rgb(15 23 42 / 0.06), 0 16px 32px -8px rgb(15 23 42 / 0.14);
+
+  --animate-entrada: entrada 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  @keyframes entrada {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 /* Só tema claro no MVP: legibilidade no sol do pátio. */
@@ -22,8 +38,25 @@
 }
 
 body {
-  background: #f8fafc;
+  background:
+    radial-gradient(48rem 24rem at 100% -8%, rgb(30 64 175 / 0.07), transparent 65%),
+    radial-gradient(40rem 20rem at -5% 0%, rgb(21 128 61 / 0.05), transparent 60%), #f8fafc;
+  background-attachment: fixed;
   color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgb(30 64 175 / 0.18);
+}
+
+/* Linhas de vaga pintadas no chão: usado no painel de marca do login. */
+.linhas-vaga {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 5.5rem,
+    rgb(255 255 255 / 0.1) 5.5rem calc(5.5rem + 3px)
+  );
 }
 
 .hachura {
@@ -32,4 +65,13 @@ body {
     transparent 0 6px,
     rgb(148 163 184 / 0.35) 6px 8px
   );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

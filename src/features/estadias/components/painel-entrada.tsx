@@ -1,6 +1,7 @@
 import { LogIn } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Placa } from "@/components/placa";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -66,7 +67,7 @@ export function PainelEntrada({ consulta, vagas, vagaId, aoEscolherVaga, aoConcl
     <Card className="space-y-4">
       <div>
         <p className="text-sm font-medium text-slate-500">Dar entrada</p>
-        <p className="text-3xl font-bold tracking-widest">{consulta.placa}</p>
+        <Placa valor={consulta.placa} tamanho="md" className="mt-1" />
       </div>
 
       {consulta.reserva && (

@@ -1,5 +1,7 @@
+import { Users } from "lucide-react";
 import type { Metadata } from "next";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Vazio } from "@/components/vazio";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { FormMensalista } from "@/features/mensalistas/components/form-mensalista";
 import { LinhaMensalista } from "@/features/mensalistas/components/linha-mensalista";
@@ -29,7 +31,7 @@ export default async function PaginaMensalistas() {
           Suspensos e atrasados primeiro. A baixa soma um mês ao vencimento e entra no seu caixa.
         </p>
         {mensalistas.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-500">Nenhum mensalista ainda.</p>
+          <Vazio Icone={Users} titulo="Nenhum mensalista ainda" dica="Crie um plano e cadastre o primeiro mensalista." />
         ) : (
           <ul className="mt-2 divide-y divide-slate-100">
             {mensalistas.map((m) => (

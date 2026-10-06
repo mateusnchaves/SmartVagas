@@ -1,8 +1,11 @@
+import { SearchX } from "lucide-react";
 import type { Metadata } from "next";
+import { Placa } from "@/components/placa";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
+import { Vazio } from "@/components/vazio";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { FormRetroativo } from "@/features/estadias/components/form-retroativo";
 import { ROTULO_FORMA } from "@/features/estadias/formas-pagamento";
@@ -56,12 +59,12 @@ export default async function PaginaHistorico({ searchParams }: PageProps<"/hist
 
       <Card>
         {estadias.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-500">Nada encontrado.</p>
+          <Vazio Icone={SearchX} titulo="Nada encontrado" dica="Tente outra placa ou outro período." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {estadias.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
-                <span className="w-24 font-bold tracking-wider">{e.placa}</span>
+                <Placa valor={e.placa} />
                 <span className="min-w-0 flex-1 text-sm text-slate-600">
                   Vaga {e.vaga.numero} · {formatarDataHora(e.entradaEm, op.fuso)} →{" "}
                   {e.saidaEm ? formatarDataHora(e.saidaEm, op.fuso) : "ainda dentro"}

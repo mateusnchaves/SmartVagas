@@ -1,8 +1,10 @@
+import { CalendarX } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Vazio } from "@/components/vazio";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { statusAssinatura } from "@/features/mensalistas/status-assinatura";
 import { CartaoReserva } from "@/features/reservas/components/cartao-reserva";
@@ -77,8 +79,12 @@ export default async function PaginaCliente() {
       </div>
 
       {ativas.length === 0 ? (
-        <Card className="py-8 text-center text-slate-500">
-          Você não tem reservas em andamento.
+        <Card>
+          <Vazio
+            Icone={CalendarX}
+            titulo="Nenhuma reserva em andamento"
+            dica="Reserve com antecedência e chegue com a vaga garantida."
+          />
         </Card>
       ) : (
         ativas.map(cartao)

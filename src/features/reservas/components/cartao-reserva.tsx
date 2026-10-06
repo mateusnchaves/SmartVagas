@@ -3,6 +3,7 @@
 import { Copy, X } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { Placa } from "@/components/placa";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -64,7 +65,7 @@ export function CartaoReserva({ reserva, fuso, chavePix, cancelamentoGratis }: P
             {formatarDataHora(new Date(reserva.inicioEm), fuso)} →{" "}
             {formatarHora(new Date(reserva.fimEm), fuso)}
           </p>
-          <p className="text-xl font-bold tracking-widest">{reserva.placa}</p>
+          <Placa valor={reserva.placa} tamanho="md" className="mt-1" />
         </div>
         <Badge variant={variant}>{rotulo}</Badge>
       </div>

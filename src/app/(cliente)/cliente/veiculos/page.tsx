@@ -1,5 +1,7 @@
+import { Car } from "lucide-react";
 import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
+import { Vazio } from "@/components/vazio";
 import { FormVeiculo, ItemVeiculo } from "@/features/veiculos/components/veiculos";
 import { prisma } from "@/server/db";
 import { exigirMotorista } from "@/server/sessao";
@@ -20,7 +22,7 @@ export default async function PaginaVeiculos() {
       <FormVeiculo />
       <Card>
         {veiculos.length === 0 ? (
-          <p className="py-4 text-center text-slate-500">Nenhum veículo cadastrado.</p>
+          <Vazio Icone={Car} titulo="Nenhum veículo cadastrado" dica="Adicione a placa do seu carro para poder reservar." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {veiculos.map((veiculo) => (

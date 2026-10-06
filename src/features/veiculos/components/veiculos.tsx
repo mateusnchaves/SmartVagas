@@ -3,6 +3,7 @@
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Placa } from "@/components/placa";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
@@ -80,7 +81,7 @@ export function ItemVeiculo({ id, placa, modelo }: { id: string; placa: string; 
   return (
     <li className="flex items-center justify-between py-2">
       <span>
-        <span className="font-bold tracking-widest">{placa}</span>
+        <Placa valor={placa} tamanho="md" />
         {modelo && <span className="ml-2 text-sm text-slate-500">{modelo}</span>}
       </span>
       <Button variant="ghost" size="icon" disabled={pendente} onClick={remover} aria-label={`Remover ${placa}`}>

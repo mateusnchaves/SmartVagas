@@ -37,7 +37,7 @@ export default async function PaginaFinanceiro({ searchParams }: PageProps<"/fin
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold capitalize">{nomeDoMes(competencia)}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight first-letter:uppercase">{nomeDoMes(competencia)}</h1>
         <nav className="flex gap-1" aria-label="Mês">
           <Link
             href={`/financeiro?mes=${deslocarCompetencia(competencia, -1)}`}

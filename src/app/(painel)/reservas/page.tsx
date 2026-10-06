@@ -1,6 +1,8 @@
+import { CircleCheck, Ticket } from "lucide-react";
 import type { Metadata } from "next";
 import { AtualizacaoAutomatica } from "@/components/atualizacao-automatica";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Vazio } from "@/components/vazio";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { LinhaReserva } from "@/features/reservas/components/lista-guiche";
 import { listarReservasDoGuiche } from "@/features/reservas/queries";
@@ -27,7 +29,7 @@ export default async function PaginaReservas() {
           Confirme depois de ver o Pix na conta. Reserva que passa do prazo expira sozinha e libera a vaga.
         </p>
         {aguardando.length === 0 ? (
-          <p className="py-4 text-sm text-slate-500">Nenhuma reserva aguardando.</p>
+          <Vazio Icone={CircleCheck} titulo="Nenhuma reserva aguardando pagamento" />
         ) : (
           <ul className="mt-2 divide-y divide-slate-100">
             {aguardando.map((reserva) => (
@@ -43,7 +45,7 @@ export default async function PaginaReservas() {
           Na chegada, digite a placa no Pátio: o sistema leva o carro para a vaga reservada.
         </p>
         {proximas.length === 0 ? (
-          <p className="py-4 text-sm text-slate-500">Nenhuma reserva paga a caminho.</p>
+          <Vazio Icone={Ticket} titulo="Nenhuma reserva paga a caminho" />
         ) : (
           <ul className="mt-2 divide-y divide-slate-100">
             {proximas.map((reserva) => (

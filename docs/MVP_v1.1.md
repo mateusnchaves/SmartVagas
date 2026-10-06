@@ -168,14 +168,14 @@ Princípio: **vermelho só significa problema**, nunca "ocupada". Isso também r
 
 | Token | Fundo | Texto | Ícone |
 |---|---|---|---|
-| Livre | `#15803D` | branco | ✓ |
+| Livre | `#F0FDF4` + borda `#16A34A` | `#14532D` | ✓ |
 | Ocupada | `#334155` | branco | carro |
 | Reservada | `#F59E0B` | `#451A03` | relógio |
 | Bloqueada | `#E2E8F0` + hachura | `#475569` | cadeado |
 | Alerta | `#DC2626` | branco | ! |
 | Primária (ações) | `#1E40AF` | branco | - |
 
-Todas as combinações passam no contraste mínimo de 4,5:1 (WCAG AA). Vaga reservável ganha um selo "R" no canto.
+Livre é claro de propósito: o operador procura as vagas ocupadas e reservadas, e uma parede de verde sólido esconde isso. Todas as combinações passam no contraste mínimo de 4,5:1 (WCAG AA). A placa do carro aparece sempre no formato Mercosul (faixa azul `#003399`), porque é como o operador reconhece o veículo. Vaga reservável ganha um selo "R" no canto.
 
 Regras: mobile-first, alvo de toque ≥ 44 px, fonte Inter, 1 ação principal por tela, só tema claro (legibilidade no sol), feedback < 1 s (toast, valor grande). Componentes únicos: Button, Input, CardVaga, BadgeStatus, Tabela.
 

@@ -1,10 +1,12 @@
-import { TriangleAlert } from "lucide-react";
+import { SquareParking, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AtualizacaoAutomatica } from "@/components/atualizacao-automatica";
+import { Placa } from "@/components/placa";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Vazio } from "@/components/vazio";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { listarDentro } from "@/features/estadias/queries";
 import { formatarCentavos } from "@/lib/dinheiro";
@@ -25,17 +27,15 @@ export default async function PaginaDentro() {
       <p className="text-sm text-slate-500">Mais antigos primeiro. Valor = quanto pagaria saindo agora.</p>
 
       {carros.length === 0 ? (
-        <p className="py-8 text-center text-slate-500">Pátio vazio.</p>
+        <Vazio Icone={SquareParking} titulo="Pátio vazio" dica="Quando um carro der entrada, ele aparece aqui." />
       ) : (
         <ul className="mt-2 divide-y divide-slate-100">
           {carros.map((carro) => (
             <li key={carro.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
               <div className="min-w-0 flex-1">
-                <p className="font-bold tracking-wider">
-                  {carro.placa}
-                  {carro.modelo && (
-                    <span className="ml-2 font-normal tracking-normal text-slate-500">{carro.modelo}</span>
-                  )}
+                <p className="flex items-center gap-2">
+                  <Placa valor={carro.placa} tamanho="md" />
+                  {carro.modelo && <span className="text-sm text-slate-500">{carro.modelo}</span>}
                 </p>
                 <p className="text-sm text-slate-600">
                   Vaga {carro.vaga} · entrou {formatarDataHora(carro.entradaEm, op.fuso)} ·{" "}

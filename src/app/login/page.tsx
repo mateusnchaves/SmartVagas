@@ -1,7 +1,7 @@
-import { CarFront } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { TelaAuth } from "@/components/tela-auth";
 import { obterSessao } from "@/server/sessao";
 import { FormLogin } from "./form-login";
 
@@ -14,20 +14,14 @@ export default async function PaginaLogin({ searchParams }: PageProps<"/login">)
   if (sessao && !semAcesso) redirect("/");
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex flex-col items-center gap-2 text-primaria">
-          <CarFront className="size-10" aria-hidden />
-          <h1 className="text-2xl font-bold">Smart Vagas</h1>
-        </div>
-        <FormLogin aviso={semAcesso ? "Este usuário não tem acesso ao painel." : undefined} />
-        <p className="text-center text-sm text-slate-600">
-          Quer reservar uma vaga?{" "}
-          <Link href="/cadastro" className="font-semibold text-primaria underline">
-            Criar conta
-          </Link>
-        </p>
-      </div>
-    </main>
+    <TelaAuth titulo="Bem-vindo de volta" subtitulo="Entre para acessar o estacionamento.">
+      <FormLogin aviso={semAcesso ? "Este usuário não tem acesso ao painel." : undefined} />
+      <p className="text-center text-sm text-slate-600 lg:text-left">
+        Quer reservar uma vaga?{" "}
+        <Link href="/cadastro" className="font-semibold text-primaria underline-offset-2 hover:underline">
+          Criar conta
+        </Link>
+      </p>
+    </TelaAuth>
   );
 }

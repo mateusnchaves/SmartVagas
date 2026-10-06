@@ -1,6 +1,7 @@
 import { Banknote, CreditCard, LogOut, QrCode, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useTransition } from "react";
 import { toast } from "sonner";
+import { Placa } from "@/components/placa";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { FormaPagamento } from "@/generated/prisma/enums";
@@ -50,7 +51,7 @@ export function PainelSaida({ consulta, fuso, aoConcluir }: Props) {
     <Card className="space-y-4">
       <div>
         <p className="text-sm font-medium text-slate-500">Dar saída</p>
-        <p className="text-3xl font-bold tracking-widest">{estadia.placa}</p>
+        <Placa valor={estadia.placa} tamanho="md" className="mt-1" />
         {estadia.modelo && <p className="text-sm text-slate-600">{estadia.modelo}</p>}
       </div>
 
