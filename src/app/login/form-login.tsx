@@ -29,7 +29,7 @@ export function FormLogin({ aviso }: { aviso?: string }) {
         );
         return;
       }
-      router.replace("/patio");
+      router.replace("/");
       router.refresh();
     });
   }

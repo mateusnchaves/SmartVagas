@@ -10,8 +10,8 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
     enabled: true,
-    // Fase 1: só o dono cria contas (RF-08). O portal do motorista abre o cadastro na Fase 2.
-    disableSignUp: true,
+    // Cadastro público é só do motorista: o hook abaixo força o papel. Operador é criado pelo dono.
+    disableSignUp: false,
   },
   // No banco, para valer entre instâncias serverless (login é alvo de força bruta).
   rateLimit: { storage: "database" },
@@ -19,6 +19,37 @@ export const auth = betterAuth({
     additionalFields: {
       papel: { type: ["dono", "operador", "motorista"], required: false, input: false },
       estacionamentoId: { type: "string", required: false, input: false },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (usuario) => {
+          // MVP: um estacionamento por conta, então todo cadastro público vai para ele.
+          const estacionamento = await prisma.estacionamento.findFirst({ select: { id: true } });
+          if (!estacionamento) return false;
+          return {
+            data: { ...usuario, papel: "motorista", estacionamentoId: estacionamento.id },
+          };
+        },
+        after: async (usuario) => {
+          const estacionamento = await prisma.estacionamento.findFirstOrThrow({ select: { id: true } });
+          // Mensalista cadastrado pelo dono com o mesmo e-mail ganha o login, sem duplicar.
+          const { count } = await prisma.motorista.updateMany({
+            where: { estacionamentoId: estacionamento.id, email: usuario.email, userId: null },
+            data: { userId: usuario.id },
+          });
+          if (count > 0) return;
+          await prisma.motorista.create({
+            data: {
+              estacionamentoId: estacionamento.id,
+              nome: usuario.name,
+              email: usuario.email,
+              userId: usuario.id,
+            },
+          });
+        },
+      },
     },
   },
   plugins: [nextCookies()],

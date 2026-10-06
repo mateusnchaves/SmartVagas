@@ -1,5 +1,6 @@
 import { CarFront } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { obterSessao } from "@/server/sessao";
 import { FormLogin } from "./form-login";
@@ -10,7 +11,7 @@ export default async function PaginaLogin({ searchParams }: PageProps<"/login">)
   const { erro } = await searchParams;
   const semAcesso = erro === "sem-acesso";
   const sessao = await obterSessao();
-  if (sessao && !semAcesso) redirect("/patio");
+  if (sessao && !semAcesso) redirect("/");
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">
@@ -20,6 +21,12 @@ export default async function PaginaLogin({ searchParams }: PageProps<"/login">)
           <h1 className="text-2xl font-bold">Smart Vagas</h1>
         </div>
         <FormLogin aviso={semAcesso ? "Este usuário não tem acesso ao painel." : undefined} />
+        <p className="text-center text-sm text-slate-600">
+          Quer reservar uma vaga?{" "}
+          <Link href="/cadastro" className="font-semibold text-primaria underline">
+            Criar conta
+          </Link>
+        </p>
       </div>
     </main>
   );

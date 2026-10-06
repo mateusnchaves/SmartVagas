@@ -75,3 +75,25 @@ export function formatarDuracao(minutos: number): string {
   const horasMin = `${horas}h${String(min).padStart(2, "0")}`;
   return dias > 0 ? `${dias}d ${horasMin}` : horasMin;
 }
+
+/** "2026-10-05T14:30" (campo datetime-local) lido como hora de parede no fuso do estacionamento. */
+export function lerHorarioLocal(texto: string, fuso: string): Date | null {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(texto);
+  if (!partes) return null;
+  const [ano, mes, dia, hora, minuto] = partes.slice(1).map(Number);
+  const data = new TZDate(ano, mes - 1, dia, hora, minuto, 0, fuso);
+  return Number.isNaN(data.getTime()) ? null : new Date(data.getTime());
+}
+
+/** Inverso de lerHorarioLocal, para preencher o campo datetime-local. */
+export function paraHorarioLocal(instante: Date, fuso: string): string {
+  const p = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: fuso,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(instante);
+  return p.replace(" ", "T");
+}

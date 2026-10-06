@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CarFront,
-  LayoutDashboard,
-  ListOrdered,
-  LogOut,
-  SquareParking,
-  Ticket,
-} from "lucide-react";
+import { CalendarPlus, Car, CarFront, LogOut, Ticket } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,13 +8,12 @@ import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const ITENS = [
-  { href: "/patio", rotulo: "Pátio", Icone: SquareParking },
-  { href: "/dentro", rotulo: "Dentro", Icone: ListOrdered },
-  { href: "/reservas", rotulo: "Reservas", Icone: Ticket },
-  { href: "/hoje", rotulo: "Hoje", Icone: LayoutDashboard },
+  { href: "/cliente", rotulo: "Reservas", Icone: Ticket, exato: true },
+  { href: "/cliente/reservar", rotulo: "Reservar", Icone: CalendarPlus, exato: false },
+  { href: "/cliente/veiculos", rotulo: "Veículos", Icone: Car, exato: false },
 ] as const;
 
-export function Cabecalho({ nome, papel }: { nome: string; papel: string }) {
+export function CabecalhoCliente({ nome }: { nome: string }) {
   const caminho = usePathname();
   const router = useRouter();
 
@@ -33,15 +25,11 @@ export function Cabecalho({ nome, papel }: { nome: string; papel: string }) {
 
   return (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
-        <Link href="/patio" className="mr-2 flex items-center gap-1.5 font-bold text-primaria">
-          <CarFront className="size-6" aria-hidden />
-          <span className="hidden sm:inline">Smart Vagas</span>
-        </Link>
-
+      <div className="mx-auto flex max-w-2xl items-center gap-2 px-4 py-2">
+        <CarFront className="mr-1 size-6 text-primaria" aria-hidden />
         <nav aria-label="Principal" className="flex flex-1 gap-1">
-          {ITENS.map(({ href, rotulo, Icone }) => {
-            const ativo = caminho.startsWith(href);
+          {ITENS.map(({ href, rotulo, Icone, exato }) => {
+            const ativo = exato ? caminho === href : caminho.startsWith(href);
             return (
               <Link
                 key={href}
@@ -53,17 +41,12 @@ export function Cabecalho({ nome, papel }: { nome: string; papel: string }) {
                 )}
               >
                 <Icone className="size-5" aria-hidden />
-                {rotulo}
+                <span className={cn(!ativo && "hidden sm:inline")}>{rotulo}</span>
               </Link>
             );
           })}
         </nav>
-
-        <span className="hidden text-right text-xs leading-tight text-slate-500 md:block">
-          {nome}
-          <br />
-          {papel}
-        </span>
+        <span className="hidden max-w-32 truncate text-xs text-slate-500 sm:block">{nome}</span>
         <Button variant="ghost" size="icon" onClick={sair} aria-label="Sair">
           <LogOut aria-hidden />
         </Button>

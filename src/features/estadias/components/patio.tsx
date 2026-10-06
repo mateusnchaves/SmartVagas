@@ -75,7 +75,11 @@ export function Patio({ vagas, agora, fuso, estadiaInicialId }: Props) {
       return;
     }
     if (vaga.status === "reservada" && !(consulta?.situacao === "fora" && consulta.vagaFixaId === vaga.id)) {
-      toast.info(`Vaga ${vaga.numero} é fixa de ${vaga.mensalistaFixo}.`);
+      toast.info(
+        vaga.mensalistaFixo
+          ? `Vaga ${vaga.numero} é fixa de ${vaga.mensalistaFixo}.`
+          : `Vaga ${vaga.numero} reservada para ${vaga.reserva?.placa}.`,
+      );
       return;
     }
     setVagaEscolhida(vaga.id);

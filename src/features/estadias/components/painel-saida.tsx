@@ -77,6 +77,15 @@ export function PainelSaida({ consulta, fuso, aoConcluir }: Props) {
         </p>
       )}
 
+      {cobranca.reserva && (
+        <p className="rounded-lg bg-slate-50 p-2 text-sm">
+          Reserva paga {cobranca.reserva}
+          {cobranca.minutosCobrados > 0
+            ? ` · ${formatarDuracao(cobranca.minutosCobrados)} além do horário reservado`
+            : " · dentro do horário reservado"}
+        </p>
+      )}
+
       <p className="text-center text-5xl font-extrabold tabular-nums">
         {formatarCentavos(cobranca.valorCentavos)}
       </p>

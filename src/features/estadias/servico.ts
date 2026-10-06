@@ -2,6 +2,8 @@ import { z } from "zod";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { buscarMensalistaPorPlaca, paraPlanoAplicado } from "@/features/mensalistas/queries";
 import { planoValeNaEntrada, statusAssinatura } from "@/features/mensalistas/status-assinatura";
+import { buscarReservaParaEntrada } from "@/features/reservas/entrada";
+import { reservaAtiva } from "@/features/reservas/servico";
 import { placaSchema } from "@/lib/placa";
 import { ErroDeNegocio } from "@/lib/resultado";
 import { dataParaDia } from "@/lib/tempo";
@@ -80,6 +82,32 @@ export async function darEntrada(contexto: Contexto, entrada: z.input<typeof ent
       throw new ErroDeNegocio("placa_dentro", `${placa} já está dentro, na vaga ${jaDentro.vaga.numero}.`);
     }
 
+    // Reserva paga: o carro vai para a vaga dela. Sem reserva, não pode ocupar vaga prometida (RN-10).
+    const reserva = await buscarReservaParaEntrada(estacionamentoId, placa, op, tx);
+    if (reserva && reserva.vagaId !== vagaId) {
+      throw new ErroDeNegocio(
+        "vaga_da_reserva",
+        `${placa} tem reserva paga na vaga ${reserva.vaga.numero}. Use essa vaga.`,
+      );
+    }
+    if (!reserva) {
+      const prometida = await tx.reserva.findFirst({
+        where: {
+          vagaId,
+          inicioEm: { lt: new Date(op.agora.getTime() + op.reservas.bloqueioAvulsoH * 3_600_000) },
+          fimEm: { gt: op.agora },
+          ...reservaAtiva(op.agora),
+        },
+        select: { placa: true },
+      });
+      if (prometida) {
+        throw new ErroDeNegocio(
+          "vaga_reservada",
+          `Vaga ${vaga.numero} está reservada para ${prometida.placa}. Escolha outra.`,
+        );
+      }
+    }
+
     const estadia = await tx.estadia.create({
       data: {
         estacionamentoId,
@@ -92,11 +120,22 @@ export async function darEntrada(contexto: Contexto, entrada: z.input<typeof ent
       },
       select: { id: true },
     });
+    if (reserva) {
+      await tx.reserva.update({
+        where: { id: reserva.id },
+        data: { status: "em_uso", estadiaId: estadia.id },
+      });
+    }
     await registrarAuditoria(tx, contexto, {
       acao: "estadia.entrada",
       entidade: "estadia",
       entidadeId: estadia.id,
-      dados: { placa, vaga: vaga.numero, mensalista: mensalista?.nome ?? null },
+      dados: {
+        placa,
+        vaga: vaga.numero,
+        mensalista: mensalista?.nome ?? null,
+        reserva: reserva?.codigo ?? null,
+      },
     });
 
     return {
@@ -119,6 +158,7 @@ export async function darSaida(contexto: Contexto, entrada: z.input<typeof saida
         placa: true,
         entradaEm: true,
         vaga: { select: { numero: true } },
+        reserva: { select: { id: true, codigo: true, inicioEm: true, fimEm: true } },
         assinatura: {
           select: {
             plano: { select: { nome: true, diasSemana: true, inicioMin: true, fimMin: true } },
@@ -130,7 +170,14 @@ export async function darSaida(contexto: Contexto, entrada: z.input<typeof saida
 
     // O valor é sempre recalculado aqui; o que o front mostrou é só prévia.
     const plano = estadia.assinatura ? paraPlanoAplicado(estadia.assinatura.plano) : null;
-    const cobranca = calcularCobranca(estadia.entradaEm, op.agora, op.tabela, op.fuso, plano);
+    const cobranca = calcularCobranca(
+      estadia.entradaEm,
+      op.agora,
+      op.tabela,
+      op.fuso,
+      plano,
+      estadia.reserva,
+    );
     const cobrar = cobranca.valorCentavos > 0;
     if (cobrar && !formaPagamento) {
       throw new ErroDeNegocio("forma_pagamento", "Escolha a forma de pagamento.");
@@ -152,6 +199,9 @@ export async function darSaida(contexto: Contexto, entrada: z.input<typeof saida
       },
     });
     if (count === 0) throw new ErroDeNegocio("estadia_inexistente", "Esse carro acabou de sair.");
+    if (estadia.reserva) {
+      await tx.reserva.update({ where: { id: estadia.reserva.id }, data: { status: "concluida" } });
+    }
 
     await registrarAuditoria(tx, contexto, {
       acao: "estadia.saida",

@@ -20,6 +20,17 @@ describe("statusDaVaga", () => {
     ).toBe("reservada");
   });
 
+  it("reserva de motorista começando em breve também reserva a vaga", () => {
+    expect(
+      statusDaVaga({
+        ativa: true,
+        temEstadiaAberta: false,
+        temMensalistaFixoValendo: false,
+        temReservaProxima: true,
+      }),
+    ).toBe("reservada");
+  });
+
   it("sem nada, livre", () => {
     expect(
       statusDaVaga({ ativa: true, temEstadiaAberta: false, temMensalistaFixoValendo: false }),

@@ -69,6 +69,12 @@ export function PainelEntrada({ consulta, vagas, vagaId, aoEscolherVaga, aoConcl
         <p className="text-3xl font-bold tracking-widest">{consulta.placa}</p>
       </div>
 
+      {consulta.reserva && (
+        <p className="rounded-lg bg-green-50 p-3 text-sm font-semibold text-green-900">
+          Reserva paga {consulta.reserva.codigo}: vaga {consulta.reserva.vaga}
+        </p>
+      )}
+
       {mensalista && (
         <div className="space-y-1 rounded-lg bg-slate-50 p-3 text-sm">
           <p className="font-semibold">

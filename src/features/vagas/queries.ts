@@ -1,6 +1,7 @@
 import type { Operacao } from "@/features/configuracao/queries";
 import { planoValeNaEntrada, statusAssinatura } from "@/features/mensalistas/status-assinatura";
 import type { TipoVaga } from "@/generated/prisma/enums";
+import { reservaAtiva } from "@/features/reservas/servico";
 import { dataParaDia } from "@/lib/tempo";
 import { prisma } from "@/server/db";
 import { statusDaVaga, type StatusVaga } from "./status-vaga";
@@ -16,6 +17,8 @@ export type VagaNoMapa = {
   motivoBloqueio: string | null;
   estadia: { id: string; placa: string; entradaEm: string } | null;
   mensalistaFixo: string | null;
+  /** Reserva de motorista que segura a vaga agora ou em breve (RN-10). */
+  reserva: { codigo: string; placa: string } | null;
 };
 
 export async function listarVagasDoMapa(
@@ -37,6 +40,15 @@ export async function listarVagasDoMapa(
       estadias: {
         where: { saidaEm: null },
         select: { id: true, placa: true, entradaEm: true },
+        take: 1,
+      },
+      reservas: {
+        where: {
+          inicioEm: { lt: new Date(op.agora.getTime() + op.reservas.bloqueioAvulsoH * 3_600_000) },
+          fimEm: { gt: op.agora },
+          ...reservaAtiva(op.agora),
+        },
+        select: { codigo: true, placa: true },
         take: 1,
       },
       assinaturasFixas: {
@@ -66,9 +78,11 @@ export async function listarVagasDoMapa(
         ativa: vaga.ativa,
         temEstadiaAberta: estadia !== null,
         temMensalistaFixoValendo: fixoValendo !== undefined,
+        temReservaProxima: vaga.reservas.length > 0,
       }),
       estadia: estadia && { ...estadia, entradaEm: estadia.entradaEm.toISOString() },
       mensalistaFixo: fixoValendo?.motorista.nome ?? null,
+      reserva: vaga.reservas[0] ?? null,
     };
   });
 }

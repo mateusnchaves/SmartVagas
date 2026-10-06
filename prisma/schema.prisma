@@ -31,6 +31,15 @@ enum FormaPagamento {
   cartao
 }
 
+enum StatusReserva {
+  pendente
+  confirmada
+  em_uso
+  concluida
+  cancelada
+  expirada
+}
+
 enum CategoriaCusto {
   folha
   aluguel
@@ -142,6 +151,7 @@ model Estacionamento {
   planos       Plano[]
   motoristas   Motorista[]
   pagamentos   PagamentoMensalidade[]
+  reservas     Reserva[]
   funcionarios Funcionario[]
   custos       Custo[]
   turnos       Turno[]
@@ -159,6 +169,19 @@ model Configuracao {
   diariaCentavos          Int      @map("diaria_centavos")
   alertaPermanenciaH      Int      @default(12) @map("alerta_permanencia_h")
   carenciaMensalidadeDias Int      @default(5) @map("carencia_mensalidade_dias")
+  // Reservas (Fase 2). Tudo editável pelo dono, como o resto.
+  antecedenciaMinMin      Int      @default(60) @map("antecedencia_min_min")
+  antecedenciaMaxDias     Int      @default(7) @map("antecedencia_max_dias")
+  duracaoMaxH             Int      @default(12) @map("duracao_max_h")
+  expiracaoPendenteMin    Int      @default(15) @map("expiracao_pendente_min")
+  cancelamentoPrazoH      Int      @default(2) @map("cancelamento_prazo_h")
+  /// % retido do valor pago quando o cancelamento é fora do prazo.
+  retencaoPct             Int      @default(100) @map("retencao_pct")
+  /// RN-10: avulso não ocupa vaga com reserva começando dentro desta janela.
+  bloqueioAvulsoH         Int      @default(3) @map("bloqueio_avulso_h")
+  chegadaAntecipadaMin    Int      @default(30) @map("chegada_antecipada_min")
+  /// Provisório até o gateway Pix (V2): exibida ao motorista para pagar a reserva.
+  chavePix                String?  @map("chave_pix")
   atualizadoEm            DateTime @updatedAt @map("atualizado_em") @db.Timestamptz(3)
 
   estacionamento Estacionamento @relation(fields: [estacionamentoId], references: [id], onDelete: Cascade)
@@ -194,6 +217,7 @@ model Vaga {
   setor            Setor?         @relation(fields: [setorId], references: [id], onDelete: SetNull)
   estadias         Estadia[]
   assinaturasFixas Assinatura[]
+  reservas         Reserva[]
 
   @@unique([estacionamentoId, numero])
   @@map("vagas")
@@ -222,6 +246,7 @@ model Estadia {
   vaga           Vaga           @relation(fields: [vagaId], references: [id])
   assinatura     Assinatura?    @relation(fields: [assinaturaId], references: [id], onDelete: SetNull)
   turno          Turno?         @relation(fields: [turnoId], references: [id], onDelete: SetNull)
+  reserva        Reserva?
   entradaPor     User           @relation("EntradaPor", fields: [entradaPorId], references: [id])
   saidaPor       User?          @relation("SaidaPor", fields: [saidaPorId], references: [id])
 
@@ -265,6 +290,7 @@ model Motorista {
   user           User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   veiculos       Veiculo[]
   assinaturas    Assinatura[]
+  reservas       Reserva[]
 
   @@map("motoristas")
 }
@@ -402,4 +428,41 @@ model AuditLog {
 
   @@index([estacionamentoId, criadoEm])
   @@map("audit_logs")
+}
+
+/// Fase 2. Sobreposição na mesma vaga é barrada na transação (lock na vaga), não por constraint:
+/// o Postgres embutido do `prisma dev` não traz btree_gist.
+model Reserva {
+  id                String        @id @default(uuid()) @db.Uuid
+  estacionamentoId  String        @map("estacionamento_id") @db.Uuid
+  vagaId            String        @map("vaga_id") @db.Uuid
+  motoristaId       String        @map("motorista_id") @db.Uuid
+  placa             String
+  /// Código curto: fallback na entrada se vier outro carro.
+  codigo            String
+  inicioEm          DateTime      @map("inicio_em") @db.Timestamptz(3)
+  fimEm             DateTime      @map("fim_em") @db.Timestamptz(3)
+  valorCentavos     Int           @map("valor_centavos")
+  status            StatusReserva @default(pendente)
+  /// Pendente que passar daqui vira expirada (calculado na leitura, sem cron).
+  expiraEm          DateTime      @map("expira_em") @db.Timestamptz(3)
+  criadaEm          DateTime      @default(now()) @map("criada_em") @db.Timestamptz(3)
+  pagaEm            DateTime?     @map("paga_em") @db.Timestamptz(3)
+  confirmadaPorId   String?       @map("confirmada_por_id")
+  canceladaEm       DateTime?     @map("cancelada_em") @db.Timestamptz(3)
+  /// Quanto devolver ao motorista no cancelamento (0 = nada). O reembolso é manual (RN-02).
+  reembolsoCentavos Int           @default(0) @map("reembolso_centavos")
+  reembolsadaEm     DateTime?     @map("reembolsada_em") @db.Timestamptz(3)
+  estadiaId         String?       @unique @map("estadia_id") @db.Uuid
+
+  estacionamento Estacionamento @relation(fields: [estacionamentoId], references: [id], onDelete: Cascade)
+  vaga           Vaga           @relation(fields: [vagaId], references: [id])
+  motorista      Motorista      @relation(fields: [motoristaId], references: [id], onDelete: Cascade)
+  estadia        Estadia?       @relation(fields: [estadiaId], references: [id], onDelete: SetNull)
+
+  @@unique([estacionamentoId, codigo])
+  @@index([vagaId, inicioEm])
+  @@index([motoristaId, status])
+  @@index([estacionamentoId, status, inicioEm])
+  @@map("reservas")
 }

@@ -1,4 +1,5 @@
 import type { TabelaPreco } from "@/features/estadias/preco";
+import type { RegrasReserva } from "@/features/reservas/regras";
 import { env } from "@/lib/env";
 import { diaCivil } from "@/lib/tempo";
 import { prisma } from "@/server/db";
@@ -11,6 +12,12 @@ export type Operacao = {
   tabela: TabelaPreco;
   alertaPermanenciaMin: number;
   carenciaDias: number;
+  reservas: RegrasReserva & {
+    expiracaoPendenteMin: number;
+    bloqueioAvulsoH: number;
+    chegadaAntecipadaMin: number;
+    chavePix: string | null;
+  };
 };
 
 export async function obterOperacao(estacionamentoId: string): Promise<Operacao> {
@@ -29,5 +36,16 @@ export async function obterOperacao(estacionamentoId: string): Promise<Operacao>
     },
     alertaPermanenciaMin: config.alertaPermanenciaH * 60,
     carenciaDias: config.carenciaMensalidadeDias,
+    reservas: {
+      antecedenciaMinMin: config.antecedenciaMinMin,
+      antecedenciaMaxDias: config.antecedenciaMaxDias,
+      duracaoMaxH: config.duracaoMaxH,
+      cancelamentoPrazoH: config.cancelamentoPrazoH,
+      retencaoPct: config.retencaoPct,
+      expiracaoPendenteMin: config.expiracaoPendenteMin,
+      bloqueioAvulsoH: config.bloqueioAvulsoH,
+      chegadaAntecipadaMin: config.chegadaAntecipadaMin,
+      chavePix: config.chavePix,
+    },
   };
 }

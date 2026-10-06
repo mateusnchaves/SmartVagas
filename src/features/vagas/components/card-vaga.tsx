@@ -34,7 +34,9 @@ type Props = {
 export function CardVaga({ vaga, agora, selecionada, aoClicar }: Props) {
   const { classe, Icone, rotulo } = ESTILO_STATUS[vaga.status];
   const tipo = ICONE_TIPO[vaga.tipo];
-  const detalhe = vaga.estadia?.placa ?? (vaga.status === "reservada" ? vaga.mensalistaFixo : rotulo);
+  const detalhe =
+    vaga.estadia?.placa ??
+    (vaga.status === "reservada" ? (vaga.mensalistaFixo ?? vaga.reserva?.placa) : rotulo);
 
   return (
     <button

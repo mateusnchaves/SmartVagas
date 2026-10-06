@@ -27,6 +27,7 @@ export async function listarDentro(estacionamentoId: string, op: Operacao): Prom
       modelo: true,
       entradaEm: true,
       vaga: { select: { numero: true } },
+      reserva: { select: { codigo: true, inicioEm: true, fimEm: true } },
       assinatura: {
         select: {
           plano: { select: { nome: true, diasSemana: true, inicioMin: true, fimMin: true } },
@@ -37,7 +38,14 @@ export async function listarDentro(estacionamentoId: string, op: Operacao): Prom
 
   return abertas.map((estadia) => {
     const plano = estadia.assinatura ? paraPlanoAplicado(estadia.assinatura.plano) : null;
-    const cobranca = calcularCobranca(estadia.entradaEm, op.agora, op.tabela, op.fuso, plano);
+    const cobranca = calcularCobranca(
+      estadia.entradaEm,
+      op.agora,
+      op.tabela,
+      op.fuso,
+      plano,
+      estadia.reserva,
+    );
     return {
       id: estadia.id,
       placa: estadia.placa,

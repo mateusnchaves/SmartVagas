@@ -154,7 +154,7 @@ async function main() {
       nome: "Estacionamento Central (demo)",
       endereco: "Rua de Demonstração, 100 - Centro, Sorocaba/SP",
       horario: "Seg-Sex 7h-20h · Sáb 7h-14h",
-      configuracao: { create: { ...TABELA } },
+      configuracao: { create: { ...TABELA, chavePix: "pix@estacionamento-demo.test" } },
     },
   });
 

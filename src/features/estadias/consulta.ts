@@ -2,6 +2,7 @@ import { z } from "zod";
 import { obterOperacao } from "@/features/configuracao/queries";
 import { buscarMensalistaPorPlaca, paraPlanoAplicado } from "@/features/mensalistas/queries";
 import { planoValeNaEntrada, type StatusAssinatura } from "@/features/mensalistas/status-assinatura";
+import { buscarReservaParaEntrada } from "@/features/reservas/entrada";
 import { listarVagasDoMapa } from "@/features/vagas/queries";
 import { sugerirVaga } from "@/features/vagas/sugestao";
 import { placaSchema } from "@/lib/placa";
@@ -22,6 +23,8 @@ export type ConsultaFora = {
   mensalista: { nome: string; plano: string; status: StatusAssinatura; venceEm: string } | null;
   vagaSugeridaId: string | null;
   vagaFixaId: string | null;
+  /** Reserva paga do motorista para agora: a entrada vai para a vaga dela. */
+  reserva: { codigo: string; vaga: string } | null;
 };
 
 export type ConsultaPlaca = ConsultaDentro | ConsultaFora;
@@ -37,6 +40,7 @@ const selecaoEstadiaAberta = {
   modelo: true,
   entradaEm: true,
   vaga: { select: { numero: true } },
+  reserva: { select: { codigo: true, inicioEm: true, fimEm: true } },
   assinatura: {
     select: { plano: { select: { nome: true, diasSemana: true, inicioMin: true, fimMin: true } } },
   },
@@ -67,7 +71,7 @@ export async function consultar(
         vaga: aberta.vaga.numero,
         entradaEm: aberta.entradaEm.toISOString(),
       },
-      cobranca: calcularCobranca(aberta.entradaEm, op.agora, op.tabela, op.fuso, plano),
+      cobranca: calcularCobranca(aberta.entradaEm, op.agora, op.tabela, op.fuso, plano, aberta.reserva),
     };
   }
 
@@ -78,6 +82,7 @@ export async function consultar(
   const mensalista = await buscarMensalistaPorPlaca(contexto.estacionamentoId, filtro.placa, op);
   const vagaFixaId =
     mensalista && planoValeNaEntrada(mensalista.status) ? mensalista.vagaFixaId : null;
+  const reserva = await buscarReservaParaEntrada(contexto.estacionamentoId, filtro.placa, op);
   const vagas = await listarVagasDoMapa(contexto.estacionamentoId, op);
 
   return {
@@ -89,7 +94,8 @@ export async function consultar(
       status: mensalista.status,
       venceEm: mensalista.venceEm,
     },
-    vagaSugeridaId: sugerirVaga(vagas, vagaFixaId),
-    vagaFixaId,
+    vagaSugeridaId: sugerirVaga(vagas, reserva?.vagaId ?? vagaFixaId),
+    vagaFixaId: reserva?.vagaId ?? vagaFixaId,
+    reserva: reserva && { codigo: reserva.codigo, vaga: reserva.vaga.numero },
   };
 }

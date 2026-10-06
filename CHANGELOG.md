@@ -4,6 +4,17 @@ Formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), versões [S
 
 ## [Unreleased]
 
+### Added
+
+- Portal do motorista (Fase 2): cadastro público, login, veículos, busca de vagas por período, reserva com código, cancelamento com reembolso conforme prazo e retenção.
+- Guichê: tela Reservas (confirmar pagamento, cancelar, marcar reembolso), entrada pela placa leva ao vaga reservada, cobrança só do excedente, mapa mostra vagas reservadas.
+- Regras de reserva editáveis no banco (antecedência, duração, expiração, prazo de cancelamento, retenção, janela do avulso, chave Pix).
+- Reserva pendente expira sozinha; uma pendente por motorista; lock na vaga contra reserva dupla.
+
+### Changed
+
+- Cadastro público habilitado, sempre com papel `motorista`. A cobrança por Pix automático (gateway) segue pendente: por enquanto o guichê confirma o pagamento.
+
 ## [0.1.0] - 2026-10-02
 
 ### Added
