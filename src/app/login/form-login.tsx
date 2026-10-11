@@ -18,7 +18,7 @@ export function FormLogin({ aviso }: { aviso?: string }) {
   function entrar(dados: FormData) {
     iniciar(async () => {
       const { error } = await authClient.signIn.email({
-        email: String(dados.get("email")),
+        email: String(dados.get("email")).trim().toLowerCase(),
         password: String(dados.get("senha")),
       });
       if (error) {
