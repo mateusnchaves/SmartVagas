@@ -11,3 +11,11 @@ quem está com a mensalidade atrasada e se o mês deu lucro depois de salários 
 
 Stack: Next.js 16, Prisma 7, Postgres, Better Auth e Tailwind v4.
 Especificação completa em [docs/MVP_v1.1.md](docs/MVP_v1.1.md).
+
+## Rodar
+
+```bash
+npm run dev
+```
+
+Sobe o banco local e o site juntos. Abra http://localhost:3000. `Ctrl+C` para os dois.

@@ -9,6 +9,14 @@ import { Input, Label } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 
 const MUITAS_TENTATIVAS = 429;
+const CREDENCIAIS_INVALIDAS = [400, 401, 403];
+
+// Só diz "senha incorreta" quando é isso mesmo: banco fora do ar não pode parecer senha errada.
+function mensagemDeErro(status: number): string {
+  if (status === MUITAS_TENTATIVAS) return "Muitas tentativas. Aguarde um minuto.";
+  if (CREDENCIAIS_INVALIDAS.includes(status)) return "E-mail ou senha incorretos.";
+  return "Não foi possível entrar agora: o servidor ou o banco de dados não respondeu. Tente de novo em instantes.";
+}
 
 export function FormLogin({ aviso }: { aviso?: string }) {
   const router = useRouter();
@@ -22,11 +30,7 @@ export function FormLogin({ aviso }: { aviso?: string }) {
         password: String(dados.get("senha")),
       });
       if (error) {
-        setErro(
-          error.status === MUITAS_TENTATIVAS
-            ? "Muitas tentativas. Aguarde um minuto."
-            : "E-mail ou senha incorretos.",
-        );
+        setErro(mensagemDeErro(error.status));
         return;
       }
       router.replace("/");

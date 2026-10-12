@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -19,7 +19,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "versao:checar": "node scripts/checar-versao.mjs",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "dev:site": "next dev"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
